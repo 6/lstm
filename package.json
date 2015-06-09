@@ -1,8 +1,8 @@
 {
-  "name": "lstm-coffee",
+  "name": "lstm",
   "version": "1.0.0",
   "description": "",
-  "main": "lstm-coffee.js",
+  "main": "lstm.js",
   "scripts": {
     "test": "node_modules/karma/bin/karma start karma.conf.coffee --single-run --browsers PhantomJS"
   },

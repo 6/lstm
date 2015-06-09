@@ -15,7 +15,7 @@ module.exports = (config) ->
 
     # list of files / patterns to load in the browser
     files: [
-      'lstm-coffee.js',
+      'lstm.js',
       'test/support/**/*.coffee',
       'test/*test.coffee'
     ]

@@ -21,7 +21,7 @@ gulp.task 'browserify', ->
   bundler
     .bundle()
     .on('error', handleErrors)
-    .pipe(source('lstm-coffee.js'))
+    .pipe(source('lstm.js'))
     .pipe(gulp.dest('.'))
     .on 'end', ->
       gutil.log('Finished', gutil.colors.green("'bundle'"))
