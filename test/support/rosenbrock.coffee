@@ -6,53 +6,48 @@
 # https://github.com/torch/optim/blob/07fb9e0e22c1ff1a64613b24f0ba290e710aa5bd/test/rosenbrock.lua
 
 window.rosenbrock = (values) ->
+  t = LSTM.tensor
   # (1) compute f(x)
 
   # x1 =  x(i)
   x1 = values[0..-2]
 
   # x(i+1) - x(i)^2
-  # x1:cmul(x1):mul(-1):add(x:narrow(1,2,d-1))
-  x1 = x1.map (n, i) -> (n * n * -1) + values[1..-1][i]
+  x1 = t.cadd(t.mul(t.cmul(x1, x1), -1), values[1..-1])
 
   # 100*(x(i+1) - x(i)^2)^2
-  # x1:cmul(x1):mul(100)
-  x1 = x1.map (n) -> n * n * 100
+  x1 = t.mul(t.cmul(x1, x1), 100)
 
   # x(i)
-  # local x0 = x.new(d-1):copy(x:narrow(1,1,d-1))
   x0 = values[0..-2]
 
   # 1-x(i)
-  # x0:mul(-1):add(1)
-  x0 = x0.map (n) -> (n * -1) + 1
+  x0 = t.add(t.mul(x0, -1), 1)
 
   # (1-x(i))^2
-  # x0:cmul(x0)
-  x0 = x0.map (n) -> n * n
+  x0 = t.cmul(x0, x0)
 
   # 100*(x(i+1) - x(i)^2)^2 + (1-x(i))^2
-  # x1:add(x0)
-  x1 = x1.map (n, i) -> x1[i] + x0[i]
+  x1 = t.cadd(x1, x0)
 
   # fout = x1:sum()
   fout = x1.reduce (x, y) -> x + y
 
   # (2) compute f(x)/dx
 
-  dxout = (0 for [1..values.length])
+  dxout = t.zeros(values.length)
 
   # df(1:D-1) = - 400*x(1:D-1).*(x(2:D)-x(1:D-1).^2) - 2*(1-x(1:D-1));
   x1 = values[0..-2]
-  x1 = x1.map (n, i) -> (n * n * -1) + values[1..-1][i]
-  x1 = x1.map (n, i) -> (n * values[0..-2][i]) * -400
-  x0 = values[0..-2].map (n) -> ((n * -1) + 1) * -2
-  x1 = x1.map (n, i) -> x1[i] + x0[i]
+  x1 = t.cadd(t.mul(t.cmul(x1, x1), -1), values[1..-1])
+  x1 = t.mul(t.cmul(x1, values[0..-2]), -400)
+  x0 = t.mul(t.add(t.mul(values[0..-2], -1), 1), -2)
+  x1 = t.cadd(x1, x0)
   (dxout[i] = value for value, i in x1)
 
   # df(2:D) = df(2:D) + 200*(x(2:D)-x(1:D-1).^2);
   x0 = values[0..-2]
-  x0 = x0.map (n, i) -> ((((n * n) * -1)) + values[1..-1][i]) * 200
+  x0 = t.mul(t.cadd(t.mul(t.cmul(x0, x0), -1), values[1..-1]), 200)
   (dxout[i + 1] += value for value, i in x0)
 
   [fout, dxout]
