@@ -8,27 +8,26 @@ window.LSTM = {
 },{"./rmsprop":2,"./tensor":3}],2:[function(require,module,exports){
 var rmsprop;
 
-rmsprop = function(opfunc, x, config, state) {
-  var alpha, dfdx, epsilon, fx, learningRate, ref, ref1, ref2, ref3, t;
+rmsprop = function(optimizationFunction, x, options, state) {
+  var alpha, dfdx, epsilon, fx, learningRate, ref, ref1, ref2, ref3, squareRoots, t;
   t = LSTM.tensor;
-  if (config == null) {
-    config = {};
+  if (options == null) {
+    options = {};
   }
   if (state == null) {
-    state = config;
+    state = options;
   }
-  learningRate = (ref = config.learningRate) != null ? ref : 1e-2;
-  alpha = (ref1 = config.alpha) != null ? ref1 : 0.99;
-  epsilon = (ref2 = config.epsilon) != null ? ref2 : 1e-8;
-  ref3 = opfunc(x), fx = ref3[0], dfdx = ref3[1];
-  if (state.m == null) {
-    state.m = t.zeros(dfdx.length);
-    state.tmp = t.zeros(dfdx.length);
+  learningRate = (ref = options.learningRate) != null ? ref : 1e-2;
+  alpha = (ref1 = options.alpha) != null ? ref1 : 0.99;
+  epsilon = (ref2 = options.epsilon) != null ? ref2 : 1e-8;
+  ref3 = optimizationFunction(x), fx = ref3[0], dfdx = ref3[1];
+  if (state.meanSquareValues == null) {
+    state.meanSquareValues = t.zeros(dfdx.length);
   }
-  state.m = t.mul(state.m, alpha);
-  state.m = t.addcmul(state.m, 1.0 - alpha, dfdx, dfdx);
-  state.tmp = t.add(t.sqrt(state.m), epsilon);
-  x = t.addcdiv(x, -learningRate, dfdx, state.tmp);
+  state.meanSquareValues = t.mul(state.meanSquareValues, alpha);
+  state.meanSquareValues = t.addcmul(state.meanSquareValues, 1.0 - alpha, dfdx, dfdx);
+  squareRoots = t.add(t.sqrt(state.meanSquareValues), epsilon);
+  x = t.addcdiv(x, -learningRate, dfdx, squareRoots);
   return [
     x, {
       1: fx
