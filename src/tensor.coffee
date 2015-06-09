@@ -1,4 +1,5 @@
-# TODO - give these more readable names
+# Based off torch math functions:
+# https://github.com/torch/torch7/blob/8d3154a028ed660d4ebfab9e7a64e0ac31a876f9/doc/maths.md
 mul = (tensor, value) ->
   tensor.map (n) -> n * value
 
