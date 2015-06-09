@@ -15,6 +15,7 @@ module.exports = (config) ->
 
     # list of files / patterns to load in the browser
     files: [
+      'test/support/**/*.coffee',
       'test/*test.coffee',
       'lstm-coffee.js'
     ]
@@ -35,7 +36,7 @@ module.exports = (config) ->
     # test results reporter to use
     # possible values: 'dots', 'progress'
     # available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['spec', 'osx']
+    reporters: ['progress', 'osx']
 
 
     # web server port
