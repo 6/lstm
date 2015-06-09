@@ -9,7 +9,8 @@ window.LSTM = {
 var rmsprop;
 
 rmsprop = function(opfunc, x, config, state) {
-  var alpha, dfdx, epsilon, fx, learningRate, ref, ref1, ref2, ref3;
+  var alpha, dfdx, epsilon, fx, learningRate, ref, ref1, ref2, ref3, t;
+  t = LSTM.tensor;
   if (config == null) {
     config = {};
   }
@@ -20,17 +21,26 @@ rmsprop = function(opfunc, x, config, state) {
   alpha = (ref1 = config.alpha) != null ? ref1 : 0.99;
   epsilon = (ref2 = config.epsilon) != null ? ref2 : 1e-8;
   ref3 = opfunc(x), fx = ref3[0], dfdx = ref3[1];
-  state.m = state.m.map(function(n) {
-    return n * alpha;
-  });
-  return [x, fx];
+  if (state.m == null) {
+    state.m = t.zeros(dfdx.length);
+    state.tmp = t.zeros(dfdx.length);
+  }
+  state.m = t.mul(state.m, alpha);
+  state.m = t.addcmul(state.m, 1.0 - alpha, dfdx, dfdx);
+  state.tmp = t.add(t.sqrt(state.m), epsilon);
+  x = t.addcdiv(x, -learningRate, dfdx, state.tmp);
+  return [
+    x, {
+      1: fx
+    }
+  ];
 };
 
 module.exports = rmsprop;
 
 
 },{}],3:[function(require,module,exports){
-var add, cadd, cmul, mul, zeros;
+var add, addcdiv, addcmul, cadd, cdiv, cmul, div, mul, sqrt, zeros;
 
 mul = function(tensor, value) {
   return tensor.map(function(n) {
@@ -41,6 +51,18 @@ mul = function(tensor, value) {
 cmul = function(tensor1, tensor2) {
   return tensor1.map(function(_, i) {
     return tensor1[i] * tensor2[i];
+  });
+};
+
+div = function(tensor, value) {
+  return tensor.map(function(n) {
+    return n / value;
+  });
+};
+
+cdiv = function(tensor1, tensor2) {
+  return tensor1.map(function(_, i) {
+    return tensor1[i] / tensor2[i];
   });
 };
 
@@ -56,6 +78,18 @@ cadd = function(tensor1, tensor2) {
   });
 };
 
+addcmul = function(x, value, tensor1, tensor2) {
+  return cadd(x, mul(cmul(tensor1, tensor2), value));
+};
+
+addcdiv = function(x, value, tensor1, tensor2) {
+  return cadd(x, mul(cdiv(tensor1, tensor2), value));
+};
+
+sqrt = function(tensor) {
+  return tensor.map(Math.sqrt);
+};
+
 zeros = function(length) {
   var j, ref, results;
   results = [];
@@ -68,8 +102,13 @@ zeros = function(length) {
 module.exports = {
   mul: mul,
   cmul: cmul,
+  div: div,
+  cdiv: cdiv,
   add: add,
   cadd: cadd,
+  addcmul: addcmul,
+  addcdiv: addcdiv,
+  sqrt: sqrt,
   zeros: zeros
 };
 
