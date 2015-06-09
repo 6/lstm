@@ -1,7 +1,7 @@
 # Divide the learning rate for a weight by a running average of the magnitudes of recent gradients for that weight.
 # Sources:
 # - Tieleman, T. and Hinton, G. (2012), Lecture 6.5 - rmsprop, COURSERA: Neural Networks for Machine Learning
-# - https://github.com/torch/optim/blob/master/rmsprop.lua
+# - https://github.com/torch/optim/blob/07fb9e0e22c1ff1a64613b24f0ba290e710aa5bd/rmsprop.lua
 
 rmsprop = (opfunc, x, config, state) ->
   t = LSTM.tensor
