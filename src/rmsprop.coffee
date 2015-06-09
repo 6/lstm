@@ -1,15 +1,14 @@
+# Implements RMS-scaled backpropagation.
 # Divide the learning rate for a weight by a running average of the magnitudes of recent gradients for that weight.
 # Sources:
 # - Tieleman, T. and Hinton, G. (2012), Lecture 6.5 - rmsprop, COURSERA: Neural Networks for Machine Learning
 # - https://github.com/torch/optim/blob/07fb9e0e22c1ff1a64613b24f0ba290e710aa5bd/rmsprop.lua
 
-rmsprop = (optimizationFunction, x, options, state) ->
+rmsprop = (optimizationFunction, x, state = {}) ->
   t = LSTM.tensor
-  options ?= {}
-  state ?= options
-  learningRate = options.learningRate ? 1e-2
-  alpha = options.alpha ? 0.99
-  epsilon = options.epsilon ? 1e-8
+  learningRate = state.learningRate ? 1e-2
+  alpha = state.alpha ? 0.99
+  epsilon = state.epsilon ? 1e-8
 
   # (1) evaluate f(x) and df/dx
   [fx, dfdx] = optimizationFunction(x)

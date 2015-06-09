@@ -8,18 +8,15 @@ window.LSTM = {
 },{"./rmsprop":2,"./tensor":3}],2:[function(require,module,exports){
 var rmsprop;
 
-rmsprop = function(optimizationFunction, x, options, state) {
+rmsprop = function(optimizationFunction, x, state) {
   var alpha, dfdx, epsilon, fx, learningRate, ref, ref1, ref2, ref3, squareRoots, t;
-  t = LSTM.tensor;
-  if (options == null) {
-    options = {};
-  }
   if (state == null) {
-    state = options;
+    state = {};
   }
-  learningRate = (ref = options.learningRate) != null ? ref : 1e-2;
-  alpha = (ref1 = options.alpha) != null ? ref1 : 0.99;
-  epsilon = (ref2 = options.epsilon) != null ? ref2 : 1e-8;
+  t = LSTM.tensor;
+  learningRate = (ref = state.learningRate) != null ? ref : 1e-2;
+  alpha = (ref1 = state.alpha) != null ? ref1 : 0.99;
+  epsilon = (ref2 = state.epsilon) != null ? ref2 : 1e-8;
   ref3 = optimizationFunction(x), fx = ref3[0], dfdx = ref3[1];
   if (state.meanSquareValues == null) {
     state.meanSquareValues = t.zeros(dfdx.length);

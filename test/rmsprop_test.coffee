@@ -10,9 +10,9 @@ describe "rmsprop", ->
   it "calculates correctly over 10,000 iterations", ->
     x = [0, 0]
     fx = []
-    config = {learningRate: 5e-4}
+    state = {learningRate: 5e-4}
     for i in [1..10001]
-      [x, f] = LSTM.rmsprop(rosenbrock, x, config)
+      [x, f] = LSTM.rmsprop(rosenbrock, x, state)
       if (i - 1) % 1000 == 0
         fx.push(f[1])
 
