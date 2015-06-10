@@ -3,9 +3,9 @@
 # Sources:
 # - Tieleman, T. and Hinton, G. (2012), Lecture 6.5 - rmsprop, COURSERA: Neural Networks for Machine Learning
 # - https://github.com/torch/optim/blob/07fb9e0e22c1ff1a64613b24f0ba290e710aa5bd/rmsprop.lua
+# - http://arxiv.org/abs/1502.04390
 
 rmsprop = (optimizationFunction, x, state = {}) ->
-  t = LSTM.tensor
   learningRate = state.learningRate ? 1e-2
   alpha = state.alpha ? 0.99
   epsilon = state.epsilon ? 1e-8
@@ -14,15 +14,15 @@ rmsprop = (optimizationFunction, x, state = {}) ->
   [fx, dfdx] = optimizationFunction(x)
 
   # (2) initialize mean square values
-  state.meanSquareValues ?= t.zeros(dfdx.length)
+  state.meanSquareValues ?= @tensor.zeros(dfdx.length)
 
   # (3) calculate new (leaky) mean squared values
-  state.meanSquareValues = t.mul(state.meanSquareValues, alpha)
-  state.meanSquareValues = t.addcmul(state.meanSquareValues, 1.0 - alpha, dfdx, dfdx)
+  state.meanSquareValues = @tensor.mul(state.meanSquareValues, alpha)
+  state.meanSquareValues = @tensor.addcmul(state.meanSquareValues, 1.0 - alpha, dfdx, dfdx)
 
   # (4) perform update
-  squareRoots = t.add(t.sqrt(state.meanSquareValues), epsilon)
-  x = t.addcdiv(x, -learningRate, dfdx, squareRoots)
+  squareRoots = @tensor.add(@tensor.sqrt(state.meanSquareValues), epsilon)
+  x = @tensor.addcdiv(x, -learningRate, dfdx, squareRoots)
 
   # return x*, f(x) before optimization
   [x, {1: fx}]

@@ -9,22 +9,21 @@ window.LSTM = {
 var rmsprop;
 
 rmsprop = function(optimizationFunction, x, state) {
-  var alpha, dfdx, epsilon, fx, learningRate, ref, ref1, ref2, ref3, squareRoots, t;
+  var alpha, dfdx, epsilon, fx, learningRate, ref, ref1, ref2, ref3, squareRoots;
   if (state == null) {
     state = {};
   }
-  t = LSTM.tensor;
   learningRate = (ref = state.learningRate) != null ? ref : 1e-2;
   alpha = (ref1 = state.alpha) != null ? ref1 : 0.99;
   epsilon = (ref2 = state.epsilon) != null ? ref2 : 1e-8;
   ref3 = optimizationFunction(x), fx = ref3[0], dfdx = ref3[1];
   if (state.meanSquareValues == null) {
-    state.meanSquareValues = t.zeros(dfdx.length);
+    state.meanSquareValues = this.tensor.zeros(dfdx.length);
   }
-  state.meanSquareValues = t.mul(state.meanSquareValues, alpha);
-  state.meanSquareValues = t.addcmul(state.meanSquareValues, 1.0 - alpha, dfdx, dfdx);
-  squareRoots = t.add(t.sqrt(state.meanSquareValues), epsilon);
-  x = t.addcdiv(x, -learningRate, dfdx, squareRoots);
+  state.meanSquareValues = this.tensor.mul(state.meanSquareValues, alpha);
+  state.meanSquareValues = this.tensor.addcmul(state.meanSquareValues, 1.0 - alpha, dfdx, dfdx);
+  squareRoots = this.tensor.add(this.tensor.sqrt(state.meanSquareValues), epsilon);
+  x = this.tensor.addcdiv(x, -learningRate, dfdx, squareRoots);
   return [
     x, {
       1: fx
